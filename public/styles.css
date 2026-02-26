@@ -1,0 +1,281 @@
+@import url('https://fonts.googleapis.com/css2?family=Bungee&family=Lexend:wght@100..900&display=swap');
+/*font-family: "Lexend", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;*/
+body{
+  font-family: "Bungee", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  background-image: url(imagenes/fondo.jpg);
+}
+.title {
+    color: rgb(255, 255, 255);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 40px;
+}
+
+#ver-mapa {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#ver-mapa button {
+  font-family: "Bungee", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 15px;
+  border-radius: 30px;
+  border: 3px solid black;
+  font-weight: lighter;
+  
+  
+  width: 120px;
+  height: 40px;
+  cursor: pointer;
+  color: rgb(239, 209, 181);
+  background: rgb(0, 0, 0) ;
+  margin: 5px; 
+
+}
+
+.subtitle {
+    color: rgb(255, 255, 255);
+    font-size: 26px;
+}
+
+.titulo {
+  color: rgb(255, 255, 255);
+}
+
+/*elemento de bloque = si le pones width y height los va a tomar en cuenta, como el div*/
+/*#para :id 
+.para class */
+
+#seleccionar-mascotas {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Usamos grid solo sobre el contenedor del h2 y labels */
+#seleccionar-mascotas h2 {
+  margin-bottom: 20px;
+}
+
+/* Que inputs no ocupen espacio */
+#seleccionar-mascotas input {
+  display: none;
+}
+
+#boton-mascota {
+  font-family: "Bungee", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 20px;
+  border-radius: 30px;
+  border: 3px solid black;
+}
+/* El botón fuera de la grilla */
+#boton-mascota {
+  
+  margin-top: 20px;
+  width: 940px;
+  height: 50px;
+  cursor: pointer;
+  color: rgb(239, 209, 181);
+  background: black ;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+
+}
+
+/* Contenedor de las tarjetas en grid */
+.contenedor-tarjetas {
+  display: grid;
+  grid-template-columns: repeat(3, 300px); /* 3 columnas */
+  grid-template-rows: repeat(2, 200px);   /* 2 filas */
+  gap: 20px; /*Espacio entre tarjetas*/
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* Estilo de las tarjetas */
+.tarjeta-de-mokepon {
+  width: 100%;                  /* que use todo el espacio de la celda del grid */
+  min-width: 300px;             /* no menos de 150px */
+  height: 200px;
+  /*background-color: rgb(239, 209, 181);*/
+  background-color: rgba(239, 209, 181, 0.5); /* 50% transparente */
+  display: flex;                /* centra el contenido */
+  align-items: center;
+
+  text-align: center;           /* centra el texto */
+  padding: 10px;                /* deja aire alrededor del texto */
+  box-sizing: border-box;       /* padding no aumenta el tamaño total */
+  border-radius: 20px;
+  font-weight: bold;
+  word-wrap: break-word;        /* si es muy largo, salta de línea */
+  color: white;
+  flex-wrap: nowrap;
+  align-content: flex-end;
+  justify-content: center;
+  flex-direction: column-reverse;
+  font-size: 20px;
+}
+
+.tarjeta-de-mokepon img {
+    width: 125px;
+}
+
+/* Estilo cuando la tarjeta está seleccionada */
+.contenedor-tarjetas input:checked + .tarjeta-de-mokepon {
+  background:  rgb(239, 209, 181);
+  /*border: 3px solid black;*/
+}
+
+
+#seleccionar-ataque {
+  flex-direction: column;
+  align-items: center;
+}
+
+.boton-ataque {
+  background-color: rgba(239, 209, 181, 0.5);
+  cursor: pointer;
+  padding: 10px;  
+  box-sizing: border-box;       /* padding no aumenta el tamaño total */
+  border-radius: 20px;
+  color: white;
+  font-size: 20px;
+  border: transparent;
+  margin: 10px;
+  font-weight: bold;
+    width: 132px;
+}
+
+
+.boton-ataque {
+  font-family: "Lexend", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+.contenedor-botones {
+  gap: 20px;
+  display: flex;
+}
+
+input[type="radio"]:checked + label.boton-ataque {
+  background-color: rgb(239, 209, 181);
+}
+
+#mensajes {
+  width: 290px;
+  background-color: rgb(239, 209, 181);
+  padding: 7px;
+  margin-top: 20px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  
+  flex-direction: column;
+  align-items: center;
+}
+
+#boton-reiniciar {
+  border: none;
+  color:white;
+  background-color: rgba(128, 128, 128, 0.5);
+  width: 165px;
+  height: 25px;
+  border-radius: 5px;
+  cursor: pointer;
+
+  font-family: "Lexend", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-weight: bolder;
+
+  margin-bottom: 10px;
+}
+
+.ataques {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  color: white;
+ 
+}
+
+#vidas-jugador, #vidas-enemigo {
+  font-size: 32px;
+  margin-bottom: 0;
+}
+
+.jugador {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 30px;
+    background-color: rgba(65, 198, 227, 0.5);
+    border-radius: 20px;
+    padding: 5px;
+    width: 475px;
+}
+
+.enemigo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 30px;
+    background-color: rgba(176, 4, 4, 0.5);
+    border-radius: 20px;
+    padding: 5px;
+    width: 475px;
+}
+
+
+
+/* ---------- Responsive: móviles -> UNA COLUMNA ---------- */
+@media (max-width: 480px) {
+  .contenedor-tarjetas {
+    grid-template-columns: 1fr; /* 1 columna -> se apilan */
+    grid-auto-rows: auto;
+  }
+
+  .tarjeta-de-mokepon {
+    min-width: 0;       /* asegurar que no impide el apilado */
+    width: 100%;        /* ocupa toda la fila */
+    max-width: 95vw;    /* opcional: margen lateral dentro del viewport */
+    justify-self: center;
+  }
+
+  /* botón sigue ocupando toda la fila */
+  #boton-mascota {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .contenedor-botones{
+    flex-direction: column;
+  }
+
+}
+
+#texto-enemigo {
+  text-align: center;
+
+}
+
+@media (max-width: 350px) {
+  #ver-mapa div {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+  }
+} 

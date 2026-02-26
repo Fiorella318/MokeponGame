@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset = "utf-8" />
+        <title>Mokepon🔥💧🌱</title>
+        <link rel="stylesheet" href="./styles.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script>
+
+
+
+        </script>
+    </head>
+    <body>
+        <h1 class="title" >MOKEPON!🔥💧🌱</h1>
+
+        <section id="seleccionar-mascotas">
+  <h2 class="subtitle">Elige a tu mascota:</h2>
+
+  <div id="contenedor-Tarjetas" class="contenedor-tarjetas">
+    
+  </div>
+
+  <button id="boton-mascota">
+        <p>Seleccionar</p>
+    </button>
+</section>
+
+    <section id="ver-mapa">
+        <h3 class="subtitle">Recorre el mapa con tu pokemon</h3>
+        <canvas id="mapa"></canvas>
+        
+        
+        <button id="arriba" ontouchstart="moverArriba()" ontouchend = "detenerMovimiento()" onmouseup="detenerMovimiento()" onmousedown="moverArriba()">Arriba</button>
+        <div >
+        <button id="izquierda" ontouchstart="moverIzquierda()" ontouchend = "detenerMovimiento()" onmouseup="detenerMovimiento()" onmousedown="moverIzquierda()">Izquierda</button>
+        <button id="abajo"  ontouchstart="moverAbajo()" ontouchend = "detenerMovimiento()" onmouseup="detenerMovimiento()" onmousedown="moverAbajo()">Abajo</button>
+        <button id="derecha"  ontouchstart="moverDerecha()" ontouchend = "detenerMovimiento()" onmouseup="detenerMovimiento()" onmousedown="moverDerecha()">Derecha</button>
+        </div>
+
+        
+        
+        
+    </section>
+
+
+        <section id = "seleccionar-ataque">
+            <h2 class="subtitle">Elige tu ataque:</h2>
+
+            <div id="contenedor-ataques" class="contenedor-botones">
+            </div> 
+
+            
+            <div id="mensajes">
+                <p id="resultado">Mucha suerte!</p>
+
+                <section id="reiniciar">
+                <button id="boton-reiniciar">Reiniciar</button>
+            </section>
+        </div>
+            
+
+
+            <div class="ataques">
+                <div class="jugador">
+                    <p>Tu mascota <span id="mascota-jugador"></span> tiene <span id="vidas-jugador">0</span> vidas</p>
+                    <div id="ataques"></div>
+                </div>
+                <div class="enemigo">
+                    <p id="texto-enemigo">La mascota <span id="mascota-enemigo"></span> del enemigo tiene <span id="vidas-enemigo">0</span> vidas</p>
+                    <div id="ataques-enemigo"></div>
+                </div>
+            </div>
+            
+        </section>
+        <script src="./js/mokepon.js"></script>
+
+    </body>
+</html>
