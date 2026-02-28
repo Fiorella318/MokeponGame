@@ -201,51 +201,51 @@ function iniciarJuego() {
     botonMascotaJugador.addEventListener("click", seleccionarMascotaJugador);    
     
     botonReiniciar.addEventListener("click", reiniciarJuego);
-
+    
+    botonJugarSolo.addEventListener("click", aparecerNpcs);
     unirseAlJuego();
 }
 
 function unirseAlJuego() {
-  fetch("http://10.30.21.45:8080/unirse")
-      .then(function(res) {
-      if (res.ok){
-        res.text()
-          .then(function (respuesta) {
-            console.log(respuesta);
-            jugadorId = respuesta;
-          })
-      }
-    })
+    fetch("http://localhost:8080/unirse")
+        .then(function (res) {
+            if (res.ok) {
+                res.text()
+                    .then(function (id) {
+                        console.log(id)
+                        jugadorId = id
+                        // IMPORTANTE: Limpiamos enemigos locales para evitar fantasmas del refresh
+                        mokeponesEnemigos = [] 
+                    })
+            }
+        })
 }
-
 function seleccionarMascotaJugador() {
-    if (!inputHipodoge.checked && !inputCapipepo.checked && !inputRatigueya.checked &&
-        !inputLangostelvis.checked && !inputTucapalma.checked && !inputPydos.checked) {
-        alert('Selecciona una mascota');
-        return; // Detiene la función si no hay selección
+    // 1. Detectar cuál está seleccionado
+    if (inputHipodoge.checked) mascotaJugador = "Hipodoge"
+    else if (inputCapipepo.checked) mascotaJugador = "Capipepo"
+    else if (inputRatigueya.checked) mascotaJugador = "Ratigueya"
+    else if (inputLangostelvis.checked) mascotaJugador = "Langostelvis"
+    else if (inputTucapalma.checked) mascotaJugador = "Tucapalma"
+    else if (inputPydos.checked) mascotaJugador = "Pydos"
+    else {
+        alert('Selecciona una mascota')
+        return
     }
 
-    // Aquí ya sabemos que hay una mascota seleccionada
-    sectionSeleccionarMascota.style.display = 'none';
-
-    if (inputHipodoge.checked) mascotaJugador = inputHipodoge.id;
-    else if (inputCapipepo.checked) mascotaJugador = inputCapipepo.id;
-    else if (inputRatigueya.checked) mascotaJugador = inputRatigueya.id;
-    else if (inputLangostelvis.checked) mascotaJugador = inputLangostelvis.id;
-    else if (inputTucapalma.checked) mascotaJugador = inputTucapalma.id;
-    else if (inputPydos.checked) mascotaJugador = inputPydos.id;
-
-    spanMascotaJugador.innerHTML = mascotaJugador;
-    seleccionarMokepon(mascotaJugador);
-    extraerAtaques(mascotaJugador);
-    sectionVerMapa.style.display = 'flex';
-    iniciarMapa();
+    // 2. Ocultar sección de selección y mostrar mapa
+    sectionSeleccionarMascota.style.display = 'none'
+    sectionVerMapa.style.display = 'flex'
+    
+    // 3. Actualizar interfaz y servidor
+    spanMascotaJugador.innerHTML = mascotaJugador
+    seleccionarMokepon(mascotaJugador) // Envía al servidor
+    extraerAtaques(mascotaJugador)
+    iniciarMapa() // Activa el canvas
 }
 
-
-
 function seleccionarMokepon(mascotaJugador) {
-  fetch(`http://10.30.21.45:8080/mokepon/${jugadorId}`,{
+  fetch(`http://localhost:8080/mokepon/${jugadorId}`,{
     method: "post",
     headers: {
       "Content-Type": "application/json"
@@ -310,7 +310,7 @@ function secuenciaAtaque() {
 }
 
 function enviarAtaques() {
-  fetch(`http://10.30.21.45:8080/mokepon/${jugadorId}/ataques`,{
+  fetch(`http://localhost:8080/mokepon/${jugadorId}/ataques`,{
     method: "post",
     headers: {
       "Content-Type": "application/json"
@@ -324,7 +324,7 @@ function enviarAtaques() {
 }
 
 function obtenerAtaques() {
-  fetch(`http://10.30.21.45:8080/mokepon/${enemigoId}/ataques`)
+  fetch(`http://localhost:8080/mokepon/${enemigoId}/ataques`)
     .then(function (res) {
       if (res.ok) {
         res.json()
@@ -458,67 +458,76 @@ function aleatorio(min, max) {
 }
 
 function pintarCanvas() {
-  mascotaJugadorObjeto.x = mascotaJugadorObjeto.x + mascotaJugadorObjeto.velocidadX;
-  mascotaJugadorObjeto.y = mascotaJugadorObjeto.y + mascotaJugadorObjeto.velocidadY;  
-  lienzo.clearRect(0, 0, mapa.width, mapa.height);
-  lienzo.drawImage (
-    mapaBackground,
-    0,
-    0,
-    mapa.width,
-    mapa.height,
-  )
-  mascotaJugadorObjeto.pintarMokepon();
+    mascotaJugadorObjeto.x = mascotaJugadorObjeto.x + mascotaJugadorObjeto.velocidadX
+    mascotaJugadorObjeto.y = mascotaJugadorObjeto.y + mascotaJugadorObjeto.velocidadY
+    
+    lienzo.clearRect(0, 0, mapa.width, mapa.height)
+    lienzo.drawImage(mapaBackground, 0, 0, mapa.width, mapa.height)
+    
+    mascotaJugadorObjeto.pintarMokepon()
 
-  enviarPosicion(mascotaJugadorObjeto.x, mascotaJugadorObjeto.y)
+    // ENVIAR NUESTRA POSICIÓN Y RECIBIR LA DE LOS DEMÁS
+    enviarPosicion(mascotaJugadorObjeto.x, mascotaJugadorObjeto.y)
 
-  mokeponesEnemigos.forEach(function (mokepon) {
-    mokepon.pintarMokepon();
-    revisarColision(mokepon);
-  })
+    // DIBUJAR A LOS ENEMIGOS
+    mokeponesEnemigos.forEach(function (enemigo) {
+        enemigo.pintarMokepon()
+        revisarColision(enemigo) // Esto activará la pelea si chocan
+    })
 }
 
 function enviarPosicion(x, y) {
-  fetch(`http://localhost:8080/mokepon/${jugadorId}/posicion`,{
+  fetch(`http://localhost:8080/mokepon/${jugadorId}/posicion`, {
     method: "post",
-    headers: {
-    "Content-Type": "application/json"
-  },
-    body: JSON.stringify({
-    x,
-    y
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ x, y })
   })
-})
   .then(function(res) {
     if (res.ok) {
-      res.json()
-        .then(function ({enemigos}){
-          console.log(enemigos);
-          mokeponesEnemigos = enemigos.map(function (enemigo){
-            let mokeponEnemigo = null;
-            const mokeponNombre = enemigo.mokepon.nombre || "";
-            if (mokeponNombre === "Hipodoge") {
-              mokeponEnemigo = new Mokepon("Hipodoge", "./imagenes/hipodoge.png", 5, "./imagenes/hipodoge.png", enemigo.id);
-            } else if (mokeponNombre === "Capipepo") {
-              mokeponEnemigo = new Mokepon("Capipepo", "./imagenes/capipepo.png", 5, "./imagenes/capipepo.png", enemigo.id);
-            } else if (mokeponNombre === "Ratigueya") {
-              mokeponEnemigo = new Mokepon("Ratigueya", "./imagenes/ratigueya.png", 5, "./imagenes/ratigueya.png", enemigo.id);
-            } else if (mokeponNombre === "Langostelvis") {
-              mokeponEnemigo = new Mokepon("Langostelvis", "./imagenes/langostelvis.png", 5, "./imagenes/langostelvis.png", enemigo.id);
-            } else if (mokeponNombre === "Tucapalma") {
-              mokeponEnemigo = new Mokepon("Tucapalma", "./imagenes/tucapalma.png", 5,"./imagenes/tucapalma.png", enemigo.id);
-            } else if (mokeponNombre === "Pydos") {
-              mokeponEnemigo = new Mokepon("Pydos", "./imagenes/pydos.png", 5, "./imagenes/pydos.png", enemigo.id);
-            }
+      res.json().then(function ({ enemigos }) {
+        // 1. Filtramos los nuevos enemigos que vienen del servidor
+        const nuevosEnemigosServidor = enemigos.map(function (enemigo) {
+          // Si el enemigo del servidor no tiene mokepon, lo ignoramos
+          if (enemigo.mokepon === undefined) {
+             return null;
+          }
+
+          let mokeponEnemigo = null;
+          const mokeponNombre = enemigo.mokepon.nombre || "";
           
+          if (mokeponNombre === "Hipodoge") {
+            mokeponEnemigo = new Mokepon("Hipodoge", "./imagenes/hipodoge.png", 5, "./imagenes/hipodoge.png", enemigo.id);
+          } else if (mokeponNombre === "Capipepo") {
+            mokeponEnemigo = new Mokepon("Capipepo", "./imagenes/capipepo.png", 5, "./imagenes/capipepo.png", enemigo.id);
+          } else if (mokeponNombre === "Ratigueya") {
+            mokeponEnemigo = new Mokepon("Ratigueya", "./imagenes/ratigueya.png", 5, "./imagenes/ratigueya.png", enemigo.id);
+          } else if (mokeponNombre === "Langostelvis") {
+            mokeponEnemigo = new Mokepon("Langostelvis", "./imagenes/langostelvis.png", 5, "./imagenes/langostelvis.png", enemigo.id);
+          } else if (mokeponNombre === "Tucapalma") {
+            mokeponEnemigo = new Mokepon("Tucapalma", "./imagenes/tucapalma.png", 5,"./imagenes/tucapalma.png", enemigo.id);
+          } else if (mokeponNombre === "Pydos") {
+            mokeponEnemigo = new Mokepon("Pydos", "./imagenes/pydos.png", 5, "./imagenes/pydos.png", enemigo.id);
+          }
+        
+          if (mokeponEnemigo) {
             mokeponEnemigo.x = enemigo.x;
             mokeponEnemigo.y = enemigo.y;
-
             return mokeponEnemigo;
-        });
-      })
+          }
+          return null;
+        }).filter(enemigo => enemigo !== null);
+
+        // 2. Mantenemos a los NPCs locales que ya estaban en la lista
+        // Buscamos los que tienen ID que empieza con "NPC"
+        const npcsActuales = mokeponesEnemigos.filter(enemigo => 
+            enemigo.id && enemigo.id.startsWith("NPC")
+        );
+
+        // 3. COMBINAMOS AMBOS: NPCs locales + Jugadores del servidor
+        mokeponesEnemigos = npcsActuales.concat(nuevosEnemigosServidor);
+      });
     }
-  })
+  });
 }
 
 function moverDerecha() {
@@ -611,4 +620,33 @@ function revisarColision (enemigo) {
   
   //alert("Hay colisión con " + enemigo.nombre);
 }
+
+const botonJugarSolo = document.getElementById("boton-jugar-solo")
+botonJugarSolo.addEventListener("click", aparecerNpcs)
+
+function aparecerNpcs() {
+    // Creamos versiones "NPC" de TODOS tus Mokepones
+    let hipodogeNpc = new Mokepon("Hipodoge", "./imagenes/hipodoge.png", 5, "./imagenes/hipodoge.png", "NPC_Hipo");
+    let capipepoNpc = new Mokepon("Capipepo", "./imagenes/capipepo.png", 5, "./imagenes/capipepo.png", "NPC_Capi");
+    let ratigueyaNpc = new Mokepon("Ratigueya", "./imagenes/ratigueya.png", 5, "./imagenes/ratigueya.png", "NPC_Rati");
+    let langostelvisNpc = new Mokepon("Langostelvis", "./imagenes/langostelvis.png", 5, "./imagenes/langostelvis.png", "NPC_Lango");
+    let tucapalmaNpc = new Mokepon("Tucapalma", "./imagenes/tucapalma.png", 5, "./imagenes/tucapalma.png", "NPC_Tuca");
+    let pydosNpc = new Mokepon("Pydos", "./imagenes/pydos.png", 5, "./imagenes/pydos.png", "NPC_Pydos");
+
+    // Los añadimos al arreglo que el mapa ya está dibujando
+    // Al usar push, se sumarán a cualquier otro jugador real que ande por ahí
+    mokeponesEnemigos.push(
+        hipodogeNpc, 
+        capipepoNpc, 
+        ratigueyaNpc, 
+        langostelvisNpc, 
+        tucapalmaNpc, 
+        pydosNpc
+    );
+    
+    // Ocultamos el botón para que no se llene el mapa de clones si le pican varias veces
+    botonJugarSolo.style.display = "none";
+}
+
+
 window.addEventListener("load", iniciarJuego);

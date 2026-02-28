@@ -74,10 +74,11 @@ app.post("/mokepon/:jugadorId/posicion", (req, res) => {
     jugadores[jugadorIndex].actualizarPosicion(x, y)
   }
 
+  // Aquí filtramos para NO enviarte a ti mismo como enemigo
   const enemigos = jugadores.filter((jugador) => jugadorId !== jugador.id)
 
   res.send({
-    enemigos
+    enemigos // Esto es lo que el frontend debe leer
   })
 })
 
@@ -106,3 +107,4 @@ app.get("/mokepon/:jugadorId/ataques", (req, res) => {
 app.listen(8080, () => {
   console.log("Servidor funcionando")
 })
+

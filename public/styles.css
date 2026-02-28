@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 @import url('https://fonts.googleapis.com/css2?family=Bungee&family=Lexend:wght@100..900&display=swap');
 /*font-family: "Lexend", sans-serif;
   font-optical-sizing: auto;
@@ -99,9 +103,10 @@ body{
   display: grid;
   grid-template-columns: repeat(3, 300px); /* 3 columnas */
   grid-template-rows: repeat(2, 200px);   /* 2 filas */
-  gap: 20px; /*Espacio entre tarjetas*/
+  gap: 15px; /*Espacio entre tarjetas*/
   justify-content: center;
-  margin-top: 20px;
+  max-width: 800px;
+    margin: 0 auto;
 }
 
 /* Estilo de las tarjetas */
@@ -130,6 +135,11 @@ body{
 
 .tarjeta-de-mokepon img {
     width: 125px;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
 }
 
 /* Estilo cuando la tarjeta está seleccionada */
@@ -205,9 +215,14 @@ input[type="radio"]:checked + label.boton-ataque {
 }
 
 .ataques {
-  display: grid;
+
   grid-template-columns: 1fr 1fr;
   color: white;
+  display: flex;
+    flex-wrap: wrap;       /* Si no caben de lado, uno baja */
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
  
 }
 
@@ -238,32 +253,29 @@ input[type="radio"]:checked + label.boton-ataque {
     width: 475px;
 }
 
+.jugador, .enemigo {
+    /* ... otros estilos ... */
+    width: 90%;          /* Ocupa el 90% del espacio disponible */
+    max-width: 450px;    /* Pero en pantallas grandes, no crece más de 450px */
+}
 
+#boton-jugar-solo {
+    background-color: #f1c40f;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    border: none;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 10px 0;
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+}
 
-/* ---------- Responsive: móviles -> UNA COLUMNA ---------- */
-@media (max-width: 480px) {
-  .contenedor-tarjetas {
-    grid-template-columns: 1fr; /* 1 columna -> se apilan */
-    grid-auto-rows: auto;
-  }
-
-  .tarjeta-de-mokepon {
-    min-width: 0;       /* asegurar que no impide el apilado */
-    width: 100%;        /* ocupa toda la fila */
-    max-width: 95vw;    /* opcional: margen lateral dentro del viewport */
-    justify-self: center;
-  }
-
-  /* botón sigue ocupando toda la fila */
-  #boton-mascota {
-    grid-column: 1 / -1;
-    width: 100%;
-  }
-
-  .contenedor-botones{
-    flex-direction: column;
-  }
-
+#boton-jugar-solo:hover {
+    transform: scale(1.05);
+    background-color: #d4ac0d;
 }
 
 #texto-enemigo {
@@ -271,11 +283,179 @@ input[type="radio"]:checked + label.boton-ataque {
 
 }
 
-@media (max-width: 350px) {
-  #ver-mapa div {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
+/* ================================================= */
+/* RESPONSIVE DESIGN SYSTEM              */
+/* ================================================= */
 
-  }
-} 
+/* --- 1. MONITOR GRANDE / DESKTOP (Desde 1024px en adelante) --- */
+@media (min-width: 1024px) {
+    .contenedor-tarjetas {
+        grid-template-columns: repeat(3, 1fr); /* 3 columnas fijas */
+        max-width: 900px;
+    }
+    
+    .ataques {
+        flex-direction: row; /* Jugador y Enemigo lado a lado */
+        justify-content: space-evenly;
+    }
+
+    #mapa {
+        width: 600px;
+        height: 450px;
+    }
+}
+
+/* --- 2. TABLET / LAPTOP PEQUEÑA (Entre 769px y 1023px) --- */
+@media (min-width: 769px) and (max-width: 1023px) {
+    .contenedor-tarjetas {
+        grid-template-columns: repeat(2, 1fr); /* 2 columnas */
+        gap: 20px;
+    }
+
+    .jugador, .enemigo {
+        width: 45%; /* Se ajustan para caber uno al lado del otro */
+    }
+
+    #mapa {
+        width: 500px;
+        height: 380px;
+    }
+}
+
+/* --- 3. MOBILE / TABLET VERTICAL (Hasta 768px) --- */
+@media (max-width: 768px) {
+    .title {
+        font-size: 30px;
+        margin-top: 20px;
+    }
+
+    .contenedor-tarjetas {
+        grid-template-columns: 1fr; /* Una sola columna para evitar amontonamiento */
+        padding: 20px;
+    }
+
+    .tarjeta-de-mokepon {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    /* En móvil, los paneles de pelea se apilan verticalmente */
+    .ataques {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .jugador, .enemigo {
+        width: 90%;
+        margin: 10px 0;
+    }
+
+    /* Botones de ataque más grandes para dedos (Touch targets) */
+    .boton-de-ataque {
+        width: 90px;
+        height: 50px;
+        font-size: 14px;
+    }
+
+    /* El mapa se adapta al ancho del celular */
+    #mapa {
+        width: 95vw; 
+        height: 70vw;
+    }
+
+    /* Controles de movimiento más cómodos */
+    #ver-mapa button {
+        width: 70px;
+        height: 50px;
+    }
+}
+
+/* --- 4. EXTRA SMALL (Celulares muy pequeños < 380px) --- */
+@media (max-width: 380px) {
+    .title {
+        font-size: 22px;
+    }
+
+    .tarjeta-de-mokepon {
+        padding: 5px;
+    }
+
+    .tarjeta-de-mokepon img {
+        width: 60px;
+    }
+}
+
+
+
+/* El contenedor que envuelve a ambos peleadores */
+.ataques {
+    display: flex;
+    flex-wrap: wrap; /* Permite que los elementos bajen si no hay espacio */
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+/* Ajuste para los paneles de Jugador y Enemigo */
+.jugador, .enemigo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    border-radius: 20px;
+    /* Cambio clave: de width fijo a width elástico con un tope */
+    width: 90%; 
+    max-width: 450px; 
+    box-sizing: border-box; /* Para que el padding no sople el ancho */
+}
+
+/* Los botones donde eliges el ataque */
+.contenedor-botones {
+    display: flex;
+    flex-wrap: wrap; /* Si el celular es pequeño, los botones se acomodan en filas */
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px;
+}
+
+.boton-de-ataque {
+    /* Ajustamos para que sean fáciles de tocar con el dedo */
+    min-width: 100px;
+    height: 50px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* --- TABLET / SMALL DESKTOP --- */
+@media (min-width: 769px) {
+    .ataques {
+        flex-direction: row; /* Uno al lado del otro */
+        align-items: flex-start;
+    }
+}
+
+/* --- MOBILE (Ajustes específicos para ataques) --- */
+@media (max-width: 768px) {
+    .ataques {
+        flex-direction: column; /* Uno arriba del otro */
+    }
+
+    .jugador, .enemigo {
+        width: 95%; /* Ocupa casi todo el ancho del celular */
+        margin: 10px 0;
+        font-size: 14px; /* Texto un poco más pequeño para que no se rompa */
+    }
+
+    #resultado {
+        font-size: 20px;
+        text-align: center;
+    }
+
+    /* Los ataques realizados (los que aparecen abajo del nombre) */
+    #ataques, #ataques-enemigo {
+        font-size: 12px;
+        line-height: 1.5;
+    }
+}
