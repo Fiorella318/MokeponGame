@@ -175,6 +175,7 @@ pydos.ataques.push(...PYDOS_ATAQUES);
 mokepones.push(hipodoge, capipepo, ratigueya, langostelvis, tucapalma, pydos);
 
 function iniciarJuego() {
+  
     sectionSeleccionarAtaque.style.display = "none";
     sectionVerMapa.style.display = "none";  
 
@@ -284,45 +285,61 @@ function mostrarAtaques(ataques) {
 }
 
 function secuenciaAtaque() {
-  botones.forEach((boton) => {
-        boton.addEventListener('click', (e) => {
-            if (e.target.textContent === '🔥') {
-                ataqueJugador.push('FUEGO')
-                console.log(ataqueJugador)
-                boton.style.background = '#112f58'
-                boton.disabled = true   
-            } else if (e.target.textContent === '💧') {
-                ataqueJugador.push('AGUA')
-                console.log(ataqueJugador)
-                boton.style.background = '#112f58'
-                boton.disabled = true  
-            } else {
-                ataqueJugador.push('TIERRA')
-                console.log(ataqueJugador)
-                boton.style.background = '#112f58'
-                boton.disabled = true  
+    botones.forEach((boton) => {
+        boton.onclick = (e) => {
+            if (ataqueJugador.length < 5) {
+                let textoAtaque = e.target.textContent;
+                
+                if (textoAtaque === '🔥') {
+                    ataqueJugador.push('FUEGO');
+                } else if (textoAtaque === '💧') {
+                    ataqueJugador.push('AGUA');
+                } else {
+                    ataqueJugador.push('TIERRA');
+                }
+                
+                console.log(ataqueJugador);
+                boton.style.background = '#112f58';
+                boton.disabled = true;
+
+                // Solo cuando tú terminas tus 5 clics, el enemigo responde
+                if (ataqueJugador.length === 5) {
+                    enviarAtaques();
+                }
             }
-            if(ataqueJugador.length === 5) {
-              enviarAtaques();
-            }
+        };
     });
-  });
 }
 
 function enviarAtaques() {
-  fetch(`http://localhost:8080/mokepon/${jugadorId}/ataques`,{
-    method: "post",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      ataques: ataqueJugador
-    })
-  })
+    if (enemigoId && enemigoId.startsWith("NPC")) {
+        // Lógica para el ataque aleatorio del NPC
+        ataqueEnemigo = [];
+        let ataquesDisponibles = [...ataquesMokeponEnemigo]; 
 
-  intervalo = setInterval(obtenerAtaques, 50);
+        for (let i = 0; i < 5; i++) {
+            let indice = Math.floor(Math.random() * ataquesDisponibles.length);
+            let nombre = ataquesDisponibles[indice].nombre;
+
+            if (nombre === "🔥") {
+                ataqueEnemigo.push("FUEGO");
+            } else if (nombre === "💧") {
+                ataqueEnemigo.push("AGUA");
+            } else {
+                ataqueEnemigo.push("TIERRA");
+            }
+        }
+        elGanador();
+    } else {
+        // Modo Multijugador normal
+        fetch(`http://localhost:8080/mokepon/${jugadorId}/ataques`, {
+            method: "post",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ataques: ataqueJugador })
+        });
+        intervalo = setInterval(obtenerAtaques, 50);
+    }
 }
-
 function obtenerAtaques() {
   fetch(`http://localhost:8080/mokepon/${enemigoId}/ataques`)
     .then(function (res) {
@@ -340,9 +357,10 @@ function obtenerAtaques() {
 
 
 function seleccionarMascotaEnemigo(enemigo) {
-  spanMascotaEnemigo.innerHTML = enemigo.nombre
-  ataquesMokeponEnemigo = enemigo.ataques
-  secuenciaAtaque()
+    spanMascotaEnemigo.innerHTML = enemigo.nombre;
+    // IMPORTANTE: Aquí guardamos los ataques reales de ese Mokepon (del array de la clase)
+    ataquesMokeponEnemigo = enemigo.ataques; 
+    secuenciaAtaque();
 }
 
 
@@ -591,62 +609,82 @@ function obtenerObjetoMascota () {
   }
 }
 
-function revisarColision (enemigo) {
-  const arribaEnemigo = enemigo.y;
-  const abajoEnemigo = enemigo.y  + enemigo.alto;
-  const derechaEnemigo = enemigo.x + enemigo.ancho;
-  const izquierdaEnemigo = enemigo.x;
+function revisarColision(enemigo) {
+    const arribaEnemigo = enemigo.y;
+    const abajoEnemigo = enemigo.y + enemigo.alto;
+    const derechaEnemigo = enemigo.x + enemigo.ancho;
+    const izquierdaEnemigo = enemigo.x;
 
-  const arribaMascota = mascotaJugadorObjeto.y;
-  const abajoMascota = mascotaJugadorObjeto.y  + mascotaJugadorObjeto.alto;
-  const derechaMascota = mascotaJugadorObjeto.x + mascotaJugadorObjeto.ancho;
-  const izquierdaMascota = mascotaJugadorObjeto.x;
-  if (
-    abajoMascota < arribaEnemigo ||
-    arribaMascota > abajoEnemigo ||
-    derechaMascota < izquierdaEnemigo ||
-    izquierdaMascota > derechaEnemigo 
-  ) {
-    return;
-  } 
-  detenerMovimiento();
-  clearInterval(intervalo);
-  console.log('Se detecto una colision');
+    const arribaMascota = mascotaJugadorObjeto.y;
+    const abajoMascota = mascotaJugadorObjeto.y + mascotaJugadorObjeto.alto;
+    const derechaMascota = mascotaJugadorObjeto.x + mascotaJugadorObjeto.ancho;
+    const izquierdaMascota = mascotaJugadorObjeto.x;
 
-  enemigoId = enemigo.id;
-  sectionSeleccionarAtaque.style.display = "flex";
-  sectionVerMapa.style.display = "none";
-  seleccionarMascotaEnemigo(enemigo);
-  
-  //alert("Hay colisión con " + enemigo.nombre);
+    if (
+        abajoMascota < arribaEnemigo ||
+        arribaMascota > abajoEnemigo ||
+        derechaMascota < izquierdaEnemigo ||
+        izquierdaMascota > derechaEnemigo
+    ) {
+        return;
+    }
+
+    detenerMovimiento();
+    clearInterval(intervalo);
+    
+    enemigoId = enemigo.id; // Aquí se guarda "NPC_Hipo" por ejemplo
+    sectionSeleccionarAtaque.style.display = "flex";
+    sectionVerMapa.style.display = "none";
+    
+    seleccionarMascotaEnemigo(enemigo);
 }
 
 const botonJugarSolo = document.getElementById("boton-jugar-solo")
 botonJugarSolo.addEventListener("click", aparecerNpcs)
 
 function aparecerNpcs() {
-    // Creamos versiones "NPC" de TODOS tus Mokepones
-    let hipodogeNpc = new Mokepon("Hipodoge", "./imagenes/hipodoge.png", 5, "./imagenes/hipodoge.png", "NPC_Hipo");
-    let capipepoNpc = new Mokepon("Capipepo", "./imagenes/capipepo.png", 5, "./imagenes/capipepo.png", "NPC_Capi");
-    let ratigueyaNpc = new Mokepon("Ratigueya", "./imagenes/ratigueya.png", 5, "./imagenes/ratigueya.png", "NPC_Rati");
-    let langostelvisNpc = new Mokepon("Langostelvis", "./imagenes/langostelvis.png", 5, "./imagenes/langostelvis.png", "NPC_Lango");
-    let tucapalmaNpc = new Mokepon("Tucapalma", "./imagenes/tucapalma.png", 5, "./imagenes/tucapalma.png", "NPC_Tuca");
-    let pydosNpc = new Mokepon("Pydos", "./imagenes/pydos.png", 5, "./imagenes/pydos.png", "NPC_Pydos");
+    if (!mascotaJugador) {
+        alert("Primero selecciona tu mascota");
+        return;
+    }
 
-    // Los añadimos al arreglo que el mapa ya está dibujando
-    // Al usar push, se sumarán a cualquier otro jugador real que ande por ahí
-    mokeponesEnemigos.push(
-        hipodogeNpc, 
-        capipepoNpc, 
-        ratigueyaNpc, 
-        langostelvisNpc, 
-        tucapalmaNpc, 
-        pydosNpc
-    );
+    // Definimos los 6 NPCs con sus ataques reales
+    let hipodogeNpc = new Mokepon("Hipodoge", "./imagenes/hipodoge.png", 5, "./imagenes/hipodoge.png", "NPC_Hipo");
+    hipodogeNpc.ataques.push(...HIPODOGE_ATAQUES);
+
+    let capipepoNpc = new Mokepon("Capipepo", "./imagenes/capipepo.png", 5, "./imagenes/capipepo.png", "NPC_Capi");
+    capipepoNpc.ataques.push(...CAPIPEPO_ATAQUES);
+
+    let ratigueyaNpc = new Mokepon("Ratigueya", "./imagenes/ratigueya.png", 5, "./imagenes/ratigueya.png", "NPC_Rati");
+    ratigueyaNpc.ataques.push(...RATIGUEYA_ATAQUES);
+
+    let langostelvisNpc = new Mokepon("Langostelvis", "./imagenes/langostelvis.png", 5, "./imagenes/langostelvis.png", "NPC_Lango");
+    langostelvisNpc.ataques.push(...LANGOSTELVIS_ATAQUES);
+
+    let tucapalmaNpc = new Mokepon("Tucapalma", "./imagenes/tucapalma.png", 5, "./imagenes/tucapalma.png", "NPC_Tuca");
+    tucapalmaNpc.ataques.push(...TUCAPALMA_ATAQUES);
+
+    let pydosNpc = new Mokepon("Pydos", "./imagenes/pydos.png", 5, "./imagenes/pydos.png", "NPC_Pydos");
+    pydosNpc.ataques.push(...PYDOS_ATAQUES);
+
+    // Los posicionamos en lugares diferentes del mapa
+    hipodogeNpc.x = 150; hipodogeNpc.y = 100;
+    capipepoNpc.x = 300; capipepoNpc.y = 200;
+    ratigueyaNpc.x = 50; ratigueyaNpc.y = 250;
+    langostelvisNpc.x = 350; langostelvisNpc.y = 50;
+    tucapalmaNpc.x = 200; tucapalmaNpc.y = 300;
+    pydosNpc.x = 400; pydosNpc.y = 150;
+
+    mokeponesEnemigos = [hipodogeNpc, capipepoNpc, ratigueyaNpc, langostelvisNpc, tucapalmaNpc, pydosNpc];
     
-    // Ocultamos el botón para que no se llene el mapa de clones si le pican varias veces
+    // MOSTRAR MAPA Y OCULTAR SELECCIÓN
+    sectionSeleccionarMascota.style.display = 'none';
+    sectionVerMapa.style.display = 'flex';
     botonJugarSolo.style.display = "none";
+
+    iniciarMapa(); 
 }
+
 
 
 window.addEventListener("load", iniciarJuego);
