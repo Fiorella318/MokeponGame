@@ -22,6 +22,10 @@ const contenedorAtaques = document.getElementById("contenedor-ataques")
 const sectionVerMapa = document.getElementById("ver-mapa");
 const mapa = document.getElementById("mapa");
 
+const botonJugarSolo = document.getElementById("boton-jugar-solo")
+botonJugarSolo.addEventListener("click", aparecerNpcs)
+
+
 let jugadorId = null;
 let enemigoId = null;
 let mokepones = [];
@@ -182,6 +186,28 @@ function iniciarJuego() {
     ataqueJugador = []
     ataqueEnemigo = []
 
+    setInterval(() => {
+        if (jugadorId) {
+            fetch(`http://localhost:8080/mokepon/${jugadorId}/posicion`, {
+                method: "post",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ x: 0, y: 0 })
+            })
+            .then(res => res.json())
+            .then(({ enemigos }) => {
+                if (enemigos.length > 0) {
+                    botonJugarSolo.disabled = true;
+                    botonJugarSolo.style.filter = "grayscale(100%)";
+                    botonJugarSolo.style.cursor = "not-allowed";
+                } else {
+                    botonJugarSolo.disabled = false;
+                    botonJugarSolo.style.filter = "none";
+                    botonJugarSolo.style.cursor = "pointer";
+                }
+            });
+        }
+    }, 1000);
+
     // 2. Control de pestañas (LocalStorage)
     if (localStorage.getItem('pestana_abierta')) {
         botonJugarSolo.disabled = true;
@@ -290,19 +316,20 @@ function extraerAtaques(mascotaJugador) {
 }
 
 function mostrarAtaques(ataques) {
+  // Esta línea borra los botones anteriores para que no se dupliquen
+  contenedorAtaques.innerHTML = ''; 
+
   ataques.forEach((ataque) => {
     ataquesMokepon = `
     <button id=${ataque.id} class="boton-ataque BAtaque">${ataque.nombre}</button> 
-    `; /*BAtaque es una nueva clase*/
+    `;
     contenedorAtaques.innerHTML += ataquesMokepon;
   });
 
   botonFuego = document.getElementById("boton-fuego");
   botonAgua = document.getElementById("boton-agua");
   botonTierra = document.getElementById("boton-tierra");
-  botones = document.querySelectorAll(".BAtaque"); /*Selecciona todos los botones de ataque que tengan la misma. No Id porque los Id son únicos*/
-
-  
+  botones = document.querySelectorAll(".BAtaque");
 }
 
 function secuenciaAtaque() {
@@ -334,25 +361,33 @@ function secuenciaAtaque() {
 
 function enviarAtaques() {
     if (enemigoId && enemigoId.startsWith("NPC")) {
-        // Lógica para el ataque aleatorio del NPC
+        // Lógica para que el NPC use SUS ataques específicos
         ataqueEnemigo = [];
-        let ataquesDisponibles = [...ataquesMokeponEnemigo]; 
+        
+        // Hacemos una copia de los ataques originales del NPC para no dañarlos
+        let ataquesParaMezclar = [...ataquesMokeponEnemigo]; 
 
-        for (let i = 0; i < 5; i++) {
-            let indice = Math.floor(Math.random() * ataquesDisponibles.length);
-            let nombre = ataquesDisponibles[indice].nombre;
+        // Mezclamos el array aleatoriamente (Algoritmo Fisher-Yates simplificado)
+        for (let i = ataquesParaMezclar.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [ataquesParaMezclar[i], ataquesParaMezclar[j]] = [ataquesParaMezclar[j], ataquesParaMezclar[i]];
+        }
 
-            if (nombre === "🔥") {
+        // Convertimos los iconos en palabras para el sistema de combate
+        ataquesParaMezclar.forEach((ataque) => {
+            if (ataque.nombre === "🔥") {
                 ataqueEnemigo.push("FUEGO");
-            } else if (nombre === "💧") {
+            } else if (ataque.nombre === "💧") {
                 ataqueEnemigo.push("AGUA");
-            } else {
+            } else if (ataque.nombre === "🌱") {
                 ataqueEnemigo.push("TIERRA");
             }
-        }
+        });
+
+        console.log("Ataques del NPC elegidos:", ataqueEnemigo);
         elGanador();
     } else {
-        // Modo Multijugador normal
+        // Modo Multijugador normal (se mantiene igual)
         fetch(`http://localhost:8080/mokepon/${jugadorId}/ataques`, {
             method: "post",
             headers: { "Content-Type": "application/json" },
@@ -671,20 +706,37 @@ function revisarColision(enemigo) {
     seleccionarMascotaEnemigo(enemigo);
 }
 
-const botonJugarSolo = document.getElementById("boton-jugar-solo")
-botonJugarSolo.addEventListener("click", aparecerNpcs)
+
 
 function aparecerNpcs() {
-    if (!mascotaJugador) {
+    // Validar si realmente se seleccionó algo en los inputs antes de avanzar
+    let mascotaSeleccionada = false;
+    if (inputHipodoge.checked) { mascotaJugador = "Hipodoge"; mascotaSeleccionada = true; }
+    else if (inputCapipepo.checked) { mascotaJugador = "Capipepo"; mascotaSeleccionada = true; }
+    else if (inputRatigueya.checked) { mascotaJugador = "Ratigueya"; mascotaSeleccionada = true; }
+    else if (inputLangostelvis.checked) { mascotaJugador = "Langostelvis"; mascotaSeleccionada = true; }
+    else if (inputTucapalma.checked) { mascotaJugador = "Tucapalma"; mascotaSeleccionada = true; }
+    else if (inputPydos.checked) { mascotaJugador = "Pydos"; mascotaSeleccionada = true; }
+
+    if (!mascotaSeleccionada) {
         alert("Primero selecciona tu mascota");
         return;
     }
 
-    // Definimos los 6 NPCs con sus ataques y posiciones
+    // LIMPIEZA DE ESTADO DE COMBATE (Para evitar entrar directo a pelea)
+    ataqueJugador = [];
+    ataqueEnemigo = [];
+    victoriasJugador = 0;
+    victoriasEnemigo = 0;
+    spanVidasJugador.innerHTML = 0;
+    spanVidasEnemigo.innerHTML = 0;
+    sectionSeleccionarAtaque.style.display = "none"; // Asegurar que el panel de ataque esté oculto
+
+    // Definición de NPCs (Tu código actual de NPCs se mantiene igual aquí...)
     let hipodogeNpc = new Mokepon("Hipodoge", "./imagenes/hipodoge.png", 5, "./imagenes/hipodoge.png", "NPC_Hipo");
     hipodogeNpc.ataques.push(...HIPODOGE_ATAQUES);
     hipodogeNpc.x = 80; hipodogeNpc.y = 120;
-
+    
     let capipepoNpc = new Mokepon("Capipepo", "./imagenes/capipepo.png", 5, "./imagenes/capipepo.png", "NPC_Capi");
     capipepoNpc.ataques.push(...CAPIPEPO_ATAQUES);
     capipepoNpc.x = 300; capipepoNpc.y = 50;
@@ -705,10 +757,21 @@ function aparecerNpcs() {
     pydosNpc.ataques.push(...PYDOS_ATAQUES);
     pydosNpc.x = 400; pydosNpc.y = 100;
 
-    // Llenamos la lista de enemigos para que aparecerán en el mapa
     mokeponesEnemigos = [hipodogeNpc, capipepoNpc, ratigueyaNpc, langostelvisNpc, tucapalmaNpc, pydosNpc];
     
+    sectionSeleccionarMascota.style.display = 'none';
+    sectionVerMapa.style.display = 'flex';
     botonJugarSolo.style.display = "none";
+
+    spanMascotaJugador.innerHTML = mascotaJugador;
+    extraerAtaques(mascotaJugador);
+    
+    // IMPORTANTE: Resetear la posición del jugador para que no aparezca encima de un NPC al reiniciar
+    mascotaJugadorObjeto = obtenerObjetoMascota(mascotaJugador);
+    mascotaJugadorObjeto.x = 10; 
+    mascotaJugadorObjeto.y = 10;
+
+    iniciarMapa(); 
 }
 
 
