@@ -98,7 +98,6 @@ class Mokepon {
   }
 }
 
-//Creación de objetos, el nombre lo estoy trayendo del "for" en HTML
 let hipodoge = new Mokepon("Hipodoge", "./imagenes/hipodoge.png", 5, "./imagenes/hipodoge.png");
 
 let capipepo = new Mokepon("Capipepo", "./imagenes/capipepo.png", 5, "./imagenes/capipepo.png");
@@ -179,7 +178,7 @@ pydos.ataques.push(...PYDOS_ATAQUES);
 mokepones.push(hipodoge, capipepo, ratigueya, langostelvis, tucapalma, pydos);
 
 function iniciarJuego() {
-    // 1. Limpieza total de variables de estado al iniciar
+    // 1. Complete clearing of state variables at start
     jugadorId = null
     enemigoId = null
     mokeponesEnemigos = []
@@ -208,7 +207,7 @@ function iniciarJuego() {
         }
     }, 1000);
 
-    // 2. Control de pestañas (LocalStorage)
+    // (LocalStorage)
     if (localStorage.getItem('pestana_abierta')) {
         botonJugarSolo.disabled = true;
         botonJugarSolo.style.filter = "grayscale(100%)";
@@ -221,11 +220,11 @@ function iniciarJuego() {
         localStorage.removeItem('pestana_abierta');
     };
   
-    // 3. Ocultar secciones iniciales
+    
     sectionSeleccionarAtaque.style.display = "none";
     sectionVerMapa.style.display = "none";  
 
-    // 4. Generar tarjetas de Mokepones
+    // Generate Mokepones cards
     mokepones.forEach((mokepon) => {
         opcionMokepones = `
         <input type="radio" name="mascota" id=${mokepon.nombre}>
@@ -237,7 +236,6 @@ function iniciarJuego() {
         contenedorTarjetas.innerHTML += opcionMokepones;
     });
 
-    // 5. IMPORTANTE: Los inputs se asignan AFUERA del forEach para que existan todos
     inputHipodoge = document.getElementById("Hipodoge");
     inputCapipepo = document.getElementById("Capipepo");
     inputRatigueya = document.getElementById("Ratigueya");
@@ -245,12 +243,11 @@ function iniciarJuego() {
     inputTucapalma = document.getElementById("Tucapalma");
     inputPydos = document.getElementById("Pydos");
 
-    // 6. Listeners de botones
     botonMascotaJugador.addEventListener("click", seleccionarMascotaJugador);    
     botonReiniciar.addEventListener("click", reiniciarJuego);
     botonJugarSolo.addEventListener("click", aparecerNpcs);
 
-    // 7. Conexión al servidor
+    // Server connection
     unirseAlJuego();
 }
 
@@ -262,14 +259,13 @@ function unirseAlJuego() {
                     .then(function (id) {
                         console.log(id)
                         jugadorId = id
-                        // IMPORTANTE: Limpiamos enemigos locales para evitar fantasmas del refresh
+                        //We cleared local enemies to avoid refresh ghosts
                         mokeponesEnemigos = [] 
                     })
             }
         })
 }
 function seleccionarMascotaJugador() {
-    // 1. Detectar cuál está seleccionado
     if (inputHipodoge.checked) mascotaJugador = "Hipodoge"
     else if (inputCapipepo.checked) mascotaJugador = "Capipepo"
     else if (inputRatigueya.checked) mascotaJugador = "Ratigueya"
@@ -281,15 +277,13 @@ function seleccionarMascotaJugador() {
         return
     }
 
-    // 2. Ocultar sección de selección y mostrar mapa
     sectionSeleccionarMascota.style.display = 'none'
     sectionVerMapa.style.display = 'flex'
     
-    // 3. Actualizar interfaz y servidor
     spanMascotaJugador.innerHTML = mascotaJugador
-    seleccionarMokepon(mascotaJugador) // Envía al servidor
+    seleccionarMokepon(mascotaJugador) // Send to the server
     extraerAtaques(mascotaJugador)
-    iniciarMapa() // Activa el canvas
+    iniciarMapa() // Activate the canvas
 }
 
 function seleccionarMokepon(mascotaJugador) {
@@ -316,7 +310,6 @@ function extraerAtaques(mascotaJugador) {
 }
 
 function mostrarAtaques(ataques) {
-  // Esta línea borra los botones anteriores para que no se dupliquen
   contenedorAtaques.innerHTML = ''; 
 
   ataques.forEach((ataque) => {
@@ -350,7 +343,6 @@ function secuenciaAtaque() {
                 boton.style.background = '#112f58';
                 boton.disabled = true;
 
-                // Solo cuando tú terminas tus 5 clics, el enemigo responde
                 if (ataqueJugador.length === 5) {
                     enviarAtaques();
                 }
@@ -361,19 +353,17 @@ function secuenciaAtaque() {
 
 function enviarAtaques() {
     if (enemigoId && enemigoId.startsWith("NPC")) {
-        // Lógica para que el NPC use SUS ataques específicos
         ataqueEnemigo = [];
         
-        // Hacemos una copia de los ataques originales del NPC para no dañarlos
+        // We make a copy of the NPC's original attacks so as not to damage them
         let ataquesParaMezclar = [...ataquesMokeponEnemigo]; 
 
-        // Mezclamos el array aleatoriamente (Algoritmo Fisher-Yates simplificado)
+        // We shuffle the array randomly (Simplified Fisher-Yates algorithm)
         for (let i = ataquesParaMezclar.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [ataquesParaMezclar[i], ataquesParaMezclar[j]] = [ataquesParaMezclar[j], ataquesParaMezclar[i]];
         }
 
-        // Convertimos los iconos en palabras para el sistema de combate
         ataquesParaMezclar.forEach((ataque) => {
             if (ataque.nombre === "🔥") {
                 ataqueEnemigo.push("FUEGO");
@@ -387,7 +377,7 @@ function enviarAtaques() {
         console.log("Ataques del NPC elegidos:", ataqueEnemigo);
         elGanador();
     } else {
-        // Modo Multijugador normal (se mantiene igual)
+        //Multiplayer
         fetch(`http://localhost:8080/mokepon/${jugadorId}/ataques`, {
             method: "post",
             headers: { "Content-Type": "application/json" },
@@ -396,6 +386,7 @@ function enviarAtaques() {
         intervalo = setInterval(obtenerAtaques, 50);
     }
 }
+
 function obtenerAtaques() {
   fetch(`http://localhost:8080/mokepon/${enemigoId}/ataques`)
     .then(function (res) {
@@ -414,7 +405,7 @@ function obtenerAtaques() {
 
 function seleccionarMascotaEnemigo(enemigo) {
     spanMascotaEnemigo.innerHTML = enemigo.nombre;
-    // IMPORTANTE: Aquí guardamos los ataques reales de ese Mokepon (del array de la clase)
+    // IMPORTANT: Here we store the actual attacks of that Mokepon (from the class array)
     ataquesMokeponEnemigo = enemigo.ataques; 
     secuenciaAtaque();
 }
@@ -432,8 +423,6 @@ function seleccionarAtaqueEnemigo() {
     }
     console.log(ataqueEnemigo);
     iniciarPelea();
-    //elGanador();
- //   spanAtaqueEnemigo.innerHTML = ataques[ataqueEnemigo];
 }
 
 function iniciarPelea() {
@@ -474,25 +463,20 @@ function elGanador () {
   for (let index = 0; index < ataqueJugador.length; index++) {
     if (ataqueJugador[index] === ataqueEnemigo[index]){
       indexOponentes(index, index)
-      crearMensaje("🤷‍♀️EMPATE🤷‍♀️");
     } else if (ataqueJugador[index] === "FUEGO" && ataqueEnemigo[index] === "TIERRA") {
       indexOponentes (index, index);
-      crearMensaje("🎉GANASTE🎉");
       victoriasJugador ++;
       spanVidasJugador.innerHTML = victoriasJugador;
     } else if (ataqueJugador[index] === "AGUA" && ataqueEnemigo[index] === "FUEGO") {
       indexOponentes(index, index);
-      crearMensaje("🎉GANASTE🎉");
       victoriasJugador ++;
       spanVidasJugador.innerHTML = victoriasJugador;
     } else if (ataqueJugador[index] === "TIERRA" && ataqueEnemigo[index] === "AGUA") {
       indexOponentes(index, index);
-      crearMensaje("🎉GANASTE🎉");
       victoriasJugador ++;
       spanVidasJugador.innerHTML = victoriasJugador;
     }else {
       indexOponentes(index, index);
-      crearMensaje("PERDISTE😵😓");
       victoriasEnemigo ++;
       spanVidasEnemigo.innerHTML = victoriasEnemigo;
     }
@@ -503,37 +487,37 @@ function elGanador () {
 function revisarVidas() {
   if (victoriasJugador == victoriasEnemigo) {
     crearMensajeFinal(`
-      <p>Esto fue un EMPATE!!!</p>
-      <p>:/</p>
+      <p>This was a TIE!!!</p>
+<p>:/</p>
     `);
   } else if (victoriasJugador > victoriasEnemigo) {
     crearMensajeFinal(`
   <p>🎉🎉🎉🎉</p>
-  <p>FELICITACIONES!!!</p>
-  <p>GANASTE EL COMBATE :D</p>
+<p>CONGRATULATIONS!!!</p>
+<p>YOU WON THE MATCH :D</p>
   `);
     } else if (victoriasJugador < victoriasEnemigo)
    {
     crearMensajeFinal(`
     <p>😓😓😓😓</p>
-    <p>Lo siento! </p>
-    <p>PERDISTE EL COMBATE :(</p>
+<p>I'm sorry!</p>
+<p>YOU LOST THE FIGHT :(</p>
     `);
     }
 }
 
 
 function reiniciarJuego() {
-    // Si tenemos un ID de jugador, avisamos al servidor antes de recargar
+// If we have a player ID, we notify the server before reloading
     if (jugadorId) {
         fetch(`http://localhost:8080/reiniciar/${jugadorId}`)
             .then(() => {
-                // Una vez el servidor confirma, limpiamos y recargamos
+                // Once the server confirms, we clear and reload
                 localStorage.removeItem('pestana_abierta');
                 location.reload();
             })
             .catch(() => {
-                // En caso de error de red, recargamos de todos modos
+                // In case of network error, we reload anyway
                 location.reload();
             });
     } else {
@@ -554,13 +538,13 @@ function pintarCanvas() {
     
     mascotaJugadorObjeto.pintarMokepon()
 
-    // ENVIAR NUESTRA POSICIÓN Y RECIBIR LA DE LOS DEMÁS
+    // SEND OUR POSITION AND RECEIVE THAT OF OTHERS
     enviarPosicion(mascotaJugadorObjeto.x, mascotaJugadorObjeto.y)
 
-    // DIBUJAR A LOS ENEMIGOS
+    // DRAW THE ENEMIES
     mokeponesEnemigos.forEach(function (enemigo) {
         enemigo.pintarMokepon()
-        revisarColision(enemigo) // Esto activará la pelea si chocan
+        revisarColision(enemigo) 
     })
 }
 
@@ -573,9 +557,9 @@ function enviarPosicion(x, y) {
   .then(function(res) {
     if (res.ok) {
       res.json().then(function ({ enemigos }) {
-        // 1. Filtramos los nuevos enemigos que vienen del servidor
+        //We filter out new enemies coming from the server
         const nuevosEnemigosServidor = enemigos.map(function (enemigo) {
-          // Si el enemigo del servidor no tiene mokepon, lo ignoramos
+         // If the enemy on the server doesn't have Mokepon, we ignore it.
           if (enemigo.mokepon === undefined) {
              return null;
           }
@@ -605,13 +589,12 @@ function enviarPosicion(x, y) {
           return null;
         }).filter(enemigo => enemigo !== null);
 
-        // 2. Mantenemos a los NPCs locales que ya estaban en la lista
-        // Buscamos los que tienen ID que empieza con "NPC"
+  
         const npcsActuales = mokeponesEnemigos.filter(enemigo => 
             enemigo.id && enemigo.id.startsWith("NPC")
         );
 
-        // 3. COMBINAMOS AMBOS: NPCs locales + Jugadores del servidor
+        // WE COMBINE BOTH: Local NPCs + Server Players
         mokeponesEnemigos = npcsActuales.concat(nuevosEnemigosServidor);
       });
     }
@@ -641,7 +624,7 @@ function detenerMovimiento() {
 }
 
 function teclaPresionada(event){
-  //con switch case es como tener muchos if juntos
+  //with switch case it's like having many if together
   switch (event.key) {
     case "ArrowUp":
       moverArriba();
@@ -697,7 +680,7 @@ function revisarColision(enemigo) {
     detenerMovimiento();
     clearInterval(intervalo);
     
-    // Guardamos el ID del enemigo (sea NPC o Humano)
+    // We save the enemy's ID (whether NPC or Human)
     enemigoId = enemigo.id;
     
     sectionSeleccionarAtaque.style.display = "flex";
@@ -709,7 +692,7 @@ function revisarColision(enemigo) {
 
 
 function aparecerNpcs() {
-    // Validar si realmente se seleccionó algo en los inputs antes de avanzar
+    // Validate if something was actually selected in the inputs before proceeding
     let mascotaSeleccionada = false;
     if (inputHipodoge.checked) { mascotaJugador = "Hipodoge"; mascotaSeleccionada = true; }
     else if (inputCapipepo.checked) { mascotaJugador = "Capipepo"; mascotaSeleccionada = true; }
@@ -723,16 +706,14 @@ function aparecerNpcs() {
         return;
     }
 
-    // LIMPIEZA DE ESTADO DE COMBATE (Para evitar entrar directo a pelea)
     ataqueJugador = [];
     ataqueEnemigo = [];
     victoriasJugador = 0;
     victoriasEnemigo = 0;
     spanVidasJugador.innerHTML = 0;
     spanVidasEnemigo.innerHTML = 0;
-    sectionSeleccionarAtaque.style.display = "none"; // Asegurar que el panel de ataque esté oculto
+    sectionSeleccionarAtaque.style.display = "none"; 
 
-    // Definición de NPCs (Tu código actual de NPCs se mantiene igual aquí...)
     let hipodogeNpc = new Mokepon("Hipodoge", "./imagenes/hipodoge.png", 5, "./imagenes/hipodoge.png", "NPC_Hipo");
     hipodogeNpc.ataques.push(...HIPODOGE_ATAQUES);
     hipodogeNpc.x = 80; hipodogeNpc.y = 120;
@@ -766,7 +747,7 @@ function aparecerNpcs() {
     spanMascotaJugador.innerHTML = mascotaJugador;
     extraerAtaques(mascotaJugador);
     
-    // IMPORTANTE: Resetear la posición del jugador para que no aparezca encima de un NPC al reiniciar
+    // IMPORTANT: Reset the player's position so they don't appear on top of an NPC when restarting
     mascotaJugadorObjeto = obtenerObjetoMascota(mascotaJugador);
     mascotaJugadorObjeto.x = 10; 
     mascotaJugadorObjeto.y = 10;
