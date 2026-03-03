@@ -175,35 +175,56 @@ pydos.ataques.push(...PYDOS_ATAQUES);
 mokepones.push(hipodoge, capipepo, ratigueya, langostelvis, tucapalma, pydos);
 
 function iniciarJuego() {
+    // 1. Limpieza total de variables de estado al iniciar
+    jugadorId = null
+    enemigoId = null
+    mokeponesEnemigos = []
+    ataqueJugador = []
+    ataqueEnemigo = []
+
+    // 2. Control de pestañas (LocalStorage)
+    if (localStorage.getItem('pestana_abierta')) {
+        botonJugarSolo.disabled = true;
+        botonJugarSolo.style.filter = "grayscale(100%)";
+        botonJugarSolo.style.cursor = "not-allowed";
+    } else {
+        localStorage.setItem('pestana_abierta', 'true');
+    }
+
+    window.onbeforeunload = () => {
+        localStorage.removeItem('pestana_abierta');
+    };
   
+    // 3. Ocultar secciones iniciales
     sectionSeleccionarAtaque.style.display = "none";
     sectionVerMapa.style.display = "none";  
 
-    mokepones.forEach((mokepon)=> {
+    // 4. Generar tarjetas de Mokepones
+    mokepones.forEach((mokepon) => {
         opcionMokepones = `
         <input type="radio" name="mascota" id=${mokepon.nombre}>
         <label class="tarjeta-de-mokepon" for=${mokepon.nombre}>
           <p>${mokepon.nombre}</p>
           <img src=${mokepon.foto} alt=${mokepon.nombre}>
         </label>
-      `;
-    contenedorTarjetas.innerHTML += opcionMokepones;
+        `;
+        contenedorTarjetas.innerHTML += opcionMokepones;
+    });
 
+    // 5. IMPORTANTE: Los inputs se asignan AFUERA del forEach para que existan todos
     inputHipodoge = document.getElementById("Hipodoge");
     inputCapipepo = document.getElementById("Capipepo");
     inputRatigueya = document.getElementById("Ratigueya");
     inputLangostelvis = document.getElementById("Langostelvis");
     inputTucapalma = document.getElementById("Tucapalma");
     inputPydos = document.getElementById("Pydos");
-    });
-    
-    
 
+    // 6. Listeners de botones
     botonMascotaJugador.addEventListener("click", seleccionarMascotaJugador);    
-    
     botonReiniciar.addEventListener("click", reiniciarJuego);
-    
     botonJugarSolo.addEventListener("click", aparecerNpcs);
+
+    // 7. Conexión al servidor
     unirseAlJuego();
 }
 
@@ -620,19 +641,16 @@ function revisarColision(enemigo) {
     const derechaMascota = mascotaJugadorObjeto.x + mascotaJugadorObjeto.ancho;
     const izquierdaMascota = mascotaJugadorObjeto.x;
 
-    if (
-        abajoMascota < arribaEnemigo ||
-        arribaMascota > abajoEnemigo ||
-        derechaMascota < izquierdaEnemigo ||
-        izquierdaMascota > derechaEnemigo
-    ) {
+    if (abajoMascota < arribaEnemigo || arribaMascota > abajoEnemigo || derechaMascota < izquierdaEnemigo || izquierdaMascota > derechaEnemigo) {
         return;
     }
 
     detenerMovimiento();
     clearInterval(intervalo);
     
-    enemigoId = enemigo.id; // Aquí se guarda "NPC_Hipo" por ejemplo
+    // Guardamos el ID del enemigo (sea NPC o Humano)
+    enemigoId = enemigo.id;
+    
     sectionSeleccionarAtaque.style.display = "flex";
     sectionVerMapa.style.display = "none";
     
@@ -648,41 +666,35 @@ function aparecerNpcs() {
         return;
     }
 
-    // Definimos los 6 NPCs con sus ataques reales
+    // Definimos los 6 NPCs con sus ataques y posiciones
     let hipodogeNpc = new Mokepon("Hipodoge", "./imagenes/hipodoge.png", 5, "./imagenes/hipodoge.png", "NPC_Hipo");
     hipodogeNpc.ataques.push(...HIPODOGE_ATAQUES);
+    hipodogeNpc.x = 80; hipodogeNpc.y = 120;
 
     let capipepoNpc = new Mokepon("Capipepo", "./imagenes/capipepo.png", 5, "./imagenes/capipepo.png", "NPC_Capi");
     capipepoNpc.ataques.push(...CAPIPEPO_ATAQUES);
+    capipepoNpc.x = 300; capipepoNpc.y = 50;
 
     let ratigueyaNpc = new Mokepon("Ratigueya", "./imagenes/ratigueya.png", 5, "./imagenes/ratigueya.png", "NPC_Rati");
     ratigueyaNpc.ataques.push(...RATIGUEYA_ATAQUES);
+    ratigueyaNpc.x = 150; ratigueyaNpc.y = 220;
 
     let langostelvisNpc = new Mokepon("Langostelvis", "./imagenes/langostelvis.png", 5, "./imagenes/langostelvis.png", "NPC_Lango");
     langostelvisNpc.ataques.push(...LANGOSTELVIS_ATAQUES);
+    langostelvisNpc.x = 350; langostelvisNpc.y = 280;
 
     let tucapalmaNpc = new Mokepon("Tucapalma", "./imagenes/tucapalma.png", 5, "./imagenes/tucapalma.png", "NPC_Tuca");
     tucapalmaNpc.ataques.push(...TUCAPALMA_ATAQUES);
+    tucapalmaNpc.x = 50; tucapalmaNpc.y = 300;
 
     let pydosNpc = new Mokepon("Pydos", "./imagenes/pydos.png", 5, "./imagenes/pydos.png", "NPC_Pydos");
     pydosNpc.ataques.push(...PYDOS_ATAQUES);
+    pydosNpc.x = 400; pydosNpc.y = 100;
 
-    // Los posicionamos en lugares diferentes del mapa
-    hipodogeNpc.x = 150; hipodogeNpc.y = 100;
-    capipepoNpc.x = 300; capipepoNpc.y = 200;
-    ratigueyaNpc.x = 50; ratigueyaNpc.y = 250;
-    langostelvisNpc.x = 350; langostelvisNpc.y = 50;
-    tucapalmaNpc.x = 200; tucapalmaNpc.y = 300;
-    pydosNpc.x = 400; pydosNpc.y = 150;
-
+    // Llenamos la lista de enemigos para que aparecerán en el mapa
     mokeponesEnemigos = [hipodogeNpc, capipepoNpc, ratigueyaNpc, langostelvisNpc, tucapalmaNpc, pydosNpc];
     
-    // MOSTRAR MAPA Y OCULTAR SELECCIÓN
-    sectionSeleccionarMascota.style.display = 'none';
-    sectionVerMapa.style.display = 'flex';
     botonJugarSolo.style.display = "none";
-
-    iniciarMapa(); 
 }
 
 
