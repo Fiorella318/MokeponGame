@@ -5,77 +5,106 @@
         <title>Mokepon🔥💧🌱</title>
         <link rel="stylesheet" href="./styles.css">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script>
+        <meta name="description" content="Browser game inspired inspired by Pokemon battle game mechanics. Choose your Mokepon, explore the map and battle against other Mokepons!">
+        <meta name="keywords" content="Fiorella, Web Development, Projects, Fullstack, Frontend, Mokepon, Game, JavaScript, HTML, CSS">
+        <meta name="author" content="Fiorella Rios Campos">
+        <meta name="robots" content="index,follow">
+    
+        <meta property="og:title" content="Mokepon - Project 02">
+        <meta property="og:description" content="Discover my new multiplayer/oneplayer game.">
+        <meta property="og:image" content="https://github.com/Fiorella318/MokeponGame/blob/main/public/imagenes/ratigueya.png">
+        <meta property="og:url" content="https://github.com/Fiorella318/MokeponGame">
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="Mokepon Game">
 
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="Fiorella, Web Development, Mokepon Game">
+        <meta name="twitter:description" content="Discover my new multiplayer/oneplayer game.">
+        <meta name="twitter:image" content="https://github.com/Fiorella318/MokeponGame/blob/main/public/imagenes/ratigueya.png">
+        <meta name="twitter:creator" content="@Fiore1228080348">
 
+        <link rel="canonical" href="https://github.com/Fiorella318/MokeponGame">
 
-        </script>
+        <link rel="icon" type="image/png" href="./assets/icons/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="./assets/icons/favicon.svg" />
+<link rel="shortcut icon" href="./assets/icons/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="Fiorella's portfolio" />
+<link rel="manifest" href="./site.webmanifest" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+
     </head>
     <body>
         <h1 class="title" >MOKEPON!🔥💧🌱</h1>
 
         <section id="seleccionar-mascotas">
-  <h2 class="subtitle">Elige a tu mascota:</h2>
+            <h2 class="subtitle">Choose your Mokepon:</h2>
+            
+            <div id="contenedor-Tarjetas" class="contenedor-Tarjetas"></div>
 
-  <div id="contenedor-Tarjetas" class="contenedor-tarjetas">
+            <button id="boton-mascota">
+                <p>Select</p>
+            </button>
+        </section>
+        
+        <section id="ver-mapa">
+        
+            <h3 class="subtitle">Explore the map with your Mokepon</h3>
+        
+            <canvas id="mapa"></canvas>
+        
+            <button id="boton-jugar-solo">Play alone</button> 
     
-  </div>
+            <div class="mapa-controles"></div>
+        
+        
+        
+            <button id="arriba" ontouchstart="moverArriba()" ontouchend = "detenerMovimiento()" onmouseup="detenerMovimiento()" onmousedown="moverArriba()">Up</button>
+        
+            <div >
+                <button id="izquierda" ontouchstart="moverIzquierda()" ontouchend = "detenerMovimiento()" onmouseup="detenerMovimiento()" onmousedown="moverIzquierda()">Left</button>
+        
+                <button id="abajo"  ontouchstart="moverAbajo()" ontouchend = "detenerMovimiento()" onmouseup="detenerMovimiento()" onmousedown="moverAbajo()">Down</button>
+        
+                <button id="derecha"  ontouchstart="moverDerecha()" ontouchend = "detenerMovimiento()" onmouseup="detenerMovimiento()" onmousedown="moverDerecha()">Right</button>
+            </div>
 
-  <button id="boton-mascota">
-        <p>Seleccionar</p>
-    </button>
-</section>
-
-    <section id="ver-mapa">
-        <h3 class="subtitle">Recorre el mapa con tu pokemon</h3>
-        <canvas id="mapa"></canvas>
-        <button id="boton-jugar-solo">Jugar Solo</button> 
-    <div class="mapa-controles">
-        </div>
-        
-        
-        <button id="arriba" ontouchstart="moverArriba()" ontouchend = "detenerMovimiento()" onmouseup="detenerMovimiento()" onmousedown="moverArriba()">Arriba</button>
-        <div >
-        <button id="izquierda" ontouchstart="moverIzquierda()" ontouchend = "detenerMovimiento()" onmouseup="detenerMovimiento()" onmousedown="moverIzquierda()">Izquierda</button>
-        <button id="abajo"  ontouchstart="moverAbajo()" ontouchend = "detenerMovimiento()" onmouseup="detenerMovimiento()" onmousedown="moverAbajo()">Abajo</button>
-        <button id="derecha"  ontouchstart="moverDerecha()" ontouchend = "detenerMovimiento()" onmouseup="detenerMovimiento()" onmousedown="moverDerecha()">Derecha</button>
-        </div>
-
-        
-        
-        
-    </section>
+        </section>
 
 
         <section id = "seleccionar-ataque">
-            <h2 class="subtitle">Elige tu ataque:</h2>
-
-            <div id="contenedor-ataques" class="contenedor-botones">
-            </div> 
-
             
+            <h2 class="subtitle">Choose your attack:</h2>
+
+            <div id="contenedor-ataques" class="contenedor-botones"></div> 
+
             <div id="mensajes">
-                <p id="resultado">Mucha suerte!</p>
+                <p id="resultado">Good luck!</p>
 
                 <section id="reiniciar">
-                <button id="boton-reiniciar">Reiniciar</button>
-            </section>
-        </div>
+                
+                    <button id="boton-reiniciar">Reset</button>
             
-
-
+                </section>
+            </div>
+            
             <div class="ataques">
                 <div class="jugador">
-                    <p>Tu mascota <span id="mascota-jugador"></span> tiene <span id="vidas-jugador">0</span> vidas</p>
+                    <p>Your Mokepon <span id="mascota-jugador"></span> has <span id="vidas-jugador">0</span> victories</p>
                     <div id="ataques"></div>
                 </div>
+                
                 <div class="enemigo">
-                    <p id="texto-enemigo">La mascota <span id="mascota-enemigo"></span> del enemigo tiene <span id="vidas-enemigo">0</span> vidas</p>
+                    <p id="texto-enemigo">The enemy's Mokepon <span id="mascota-enemigo"></span> has <span id="vidas-enemigo">0</span> victories</p>
                     <div id="ataques-enemigo"></div>
                 </div>
             </div>
             
         </section>
+
         <script src="./js/mokepon.js"></script>
 
     </body>

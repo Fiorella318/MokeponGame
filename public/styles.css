@@ -99,7 +99,7 @@ body{
 }
 
 /* Contenedor de las tarjetas en grid */
-.contenedor-tarjetas {
+.contenedor-Tarjetas {
   display: grid;
   grid-template-columns: repeat(3, 300px); /* 3 columnas */
   grid-template-rows: repeat(2, 200px);   /* 2 filas */
@@ -143,7 +143,7 @@ img {
 }
 
 /* Estilo cuando la tarjeta está seleccionada */
-.contenedor-tarjetas input:checked + .tarjeta-de-mokepon {
+.contenedor-Tarjetas input:checked + .tarjeta-de-mokepon {
   background:  rgb(239, 209, 181);
   /*border: 3px solid black;*/
 }
@@ -284,7 +284,7 @@ input[type="radio"]:checked + label.boton-ataque {
 
 /* --- 1. MONITOR GRANDE / DESKTOP (Desde 1024px en adelante) --- */
 @media (min-width: 1024px) {
-    .contenedor-tarjetas {
+    .contenedor-Tarjetas {
         grid-template-columns: repeat(3, 1fr); /* 3 columnas fijas */
         max-width: 900px;
     }
@@ -302,7 +302,7 @@ input[type="radio"]:checked + label.boton-ataque {
 
 /* --- 2. TABLET / LAPTOP PEQUEÑA (Entre 769px y 1023px) --- */
 @media (min-width: 769px) and (max-width: 1023px) {
-    .contenedor-tarjetas {
+    .contenedor-Tarjetas {
         grid-template-columns: repeat(2, 1fr); /* 2 columnas */
         gap: 20px;
     }
@@ -324,7 +324,7 @@ input[type="radio"]:checked + label.boton-ataque {
         margin-top: 20px;
     }
 
-    .contenedor-tarjetas {
+    .contenedor-Tarjetas {
         grid-template-columns: 1fr; /* Una sola columna para evitar amontonamiento */
         padding: 20px;
     }
