@@ -104,6 +104,19 @@ app.get("/mokepon/:jugadorId/ataques", (req, res) => {
   })
 })
 
+// Agrega esto al final de index.js, antes de app.listen
+app.get("/reiniciar/:jugadorId", (req, res) => {
+  const jugadorId = req.params.jugadorId || ""
+  const jugadorIndex = jugadores.findIndex((jugador) => jugadorId === jugador.id)
+
+  if (jugadorIndex >= 0) {
+    // Eliminamos al jugador del array para limpiar el servidor
+    jugadores.splice(jugadorIndex, 1)
+  }
+  
+  res.send({ status: "OK" })
+})
+
 app.listen(8080, () => {
   console.log("Servidor funcionando")
 })

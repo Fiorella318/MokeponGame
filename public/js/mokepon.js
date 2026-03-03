@@ -489,7 +489,21 @@ function revisarVidas() {
 
 
 function reiniciarJuego() {
-  location.reload();
+    // Si tenemos un ID de jugador, avisamos al servidor antes de recargar
+    if (jugadorId) {
+        fetch(`http://localhost:8080/reiniciar/${jugadorId}`)
+            .then(() => {
+                // Una vez el servidor confirma, limpiamos y recargamos
+                localStorage.removeItem('pestana_abierta');
+                location.reload();
+            })
+            .catch(() => {
+                // En caso de error de red, recargamos de todos modos
+                location.reload();
+            });
+    } else {
+        location.reload();
+    }
 }
 
 function aleatorio(min, max) {
