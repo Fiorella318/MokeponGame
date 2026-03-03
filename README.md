@@ -66,11 +66,11 @@ Adaptive interface focused on User Experience (UX) using Flexbox, CSS Grid, and 
     node index.js
     ```
 4.  **Run the Client:**
-    Open `index.html` in your browser (Live Server extension recommended).
+    Open `index.html` in your browser (Live Server extension - localhost indicated in the index.js is recommended).
 
 ---
 
-## 📈 Roadmap (Senior Perspective)
+## 📈 Roadmap (opportunities for improvement)
 
 * [ ] **WebSockets Migration:** Transitioning from HTTP Polling to `Socket.io` for ultra-low latency bi-directional communication.
 * [ ] **Database Integration:** Implementing MongoDB to persist player statistics and global leaderboards.
