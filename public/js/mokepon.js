@@ -462,21 +462,26 @@ function elGanador () {
 
   for (let index = 0; index < ataqueJugador.length; index++) {
     if (ataqueJugador[index] === ataqueEnemigo[index]){
-      indexOponentes(index, index)
+      indexOponentes(index, index);
+      crearMensaje();
     } else if (ataqueJugador[index] === "FUEGO" && ataqueEnemigo[index] === "TIERRA") {
       indexOponentes (index, index);
+      crearMensaje();
       victoriasJugador ++;
       spanVidasJugador.innerHTML = victoriasJugador;
     } else if (ataqueJugador[index] === "AGUA" && ataqueEnemigo[index] === "FUEGO") {
       indexOponentes(index, index);
+      crearMensaje();
       victoriasJugador ++;
       spanVidasJugador.innerHTML = victoriasJugador;
     } else if (ataqueJugador[index] === "TIERRA" && ataqueEnemigo[index] === "AGUA") {
       indexOponentes(index, index);
+      crearMensaje();
       victoriasJugador ++;
       spanVidasJugador.innerHTML = victoriasJugador;
     }else {
       indexOponentes(index, index);
+      crearMensaje();
       victoriasEnemigo ++;
       spanVidasEnemigo.innerHTML = victoriasEnemigo;
     }
@@ -754,7 +759,5 @@ function aparecerNpcs() {
 
     iniciarMapa(); 
 }
-
-
 
 window.addEventListener("load", iniciarJuego);
