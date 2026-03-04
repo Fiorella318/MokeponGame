@@ -77,5 +77,11 @@ Adaptive interface focused on User Experience (UX) using Flexbox, CSS Grid, and 
 * [ ] **Modular Refactoring:** Using a bundler like Vite or Webpack to enhance maintainability and code splitting.
 
 ---
+## See it on
+### My portfolio: 
+[https://fiorella318.github.io/Fiorella-Rios-Campos.github.io/projects.html](https://fiorella318.github.io/Fiorella-Rios-Campos.github.io/projects.html)
+
+### Video:
+[https://youtu.be/M7SUy_WTV6I?si=RZaI5YEzhRED-0Y6](https://youtu.be/M7SUy_WTV6I?si=RZaI5YEzhRED-0Y6)
 
 > **Technical Note:** Developed as a comprehensive demonstration of full-stack integration, asynchronous logic, and advanced Canvas manipulation.
